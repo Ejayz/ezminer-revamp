@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 export default function IndexNavigationBar({
-  child,
+  children,
 }: Readonly<{
-  child: React.ReactNode;
+  children: React.ReactNode;
 }>) {
   return (
     <div className="drawer text-black">
@@ -51,7 +51,7 @@ export default function IndexNavigationBar({
           </div>
         </div>
         {/* Page content here */}
-        {child}
+        {children}
         <footer className="footer items-center p-4 bg-neutral text-neutral-content">
           <aside className="items-center grid-flow-col">
             <svg

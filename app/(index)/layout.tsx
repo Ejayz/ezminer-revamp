@@ -21,7 +21,7 @@ export default function RootLayout({
     <html data-theme={"custom1"} lang="en">
       <body className={inter.className}>
         <Suspense fallback={<div>Loading...</div>}>
-          <Providers children={children} />
+          <IndexNavigationBar>{children}</IndexNavigationBar>
         </Suspense>
       </body>
     </html>

@@ -1,13 +1,15 @@
 // In Next.js, this file would be called: app/providers.jsx
-'use client'
+"use client";
 
 // We can not useState or useRef in a server component, which is why we are
 // extracting this part out into it's own file with 'use client' on top
-import { useState } from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import IndexNavigationBar from '@/components/IndexNavigationBar'
+import { useState } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import IndexNavigationBar from "@/components/IndexNavigationBar";
 
-export default function Providers({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function Providers({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -18,12 +20,10 @@ export default function Providers({ children }: Readonly<{ children: React.React
             staleTime: 60 * 1000,
           },
         },
-      }),
-  )
+      })
+  );
 
   return (
-    <QueryClientProvider client={queryClient}>
-        <IndexNavigationBar child={children} />
-    </QueryClientProvider>
-  )
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
 }

@@ -1,3 +1,4 @@
+import Providers from "@/app/provider";
 import Link from "next/link";
 
 export default function IndexNavigationBar({
@@ -51,7 +52,7 @@ export default function IndexNavigationBar({
           </div>
         </div>
         {/* Page content here */}
-        {children}
+        <Providers>{children}</Providers>
         <footer className="footer items-center p-4 bg-neutral text-neutral-content">
           <aside className="items-center grid-flow-col">
             <svg

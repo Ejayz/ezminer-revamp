@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../../styles/globals.css";
-import IndexNavigationBar from "@/components/IndexNavigationBar";
+import DashboardNavigationBar from "@/components/DashboardNavigationBar";
 import Providers from "../provider";
 import { Suspense } from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,7 +25,20 @@ export default function RootLayout({
     <html data-theme={"custom1"} lang="en">
       <body className={inter.className}>
         <Suspense fallback={<div>Loading...</div>}>
-          <IndexNavigationBar>{children}</IndexNavigationBar>
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+            limit={5}
+          />
+          <DashboardNavigationBar>{children}</DashboardNavigationBar>
         </Suspense>
       </body>
     </html>

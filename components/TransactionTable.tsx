@@ -1,6 +1,7 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { DateTime } from "luxon";
 import { useState } from "react";
 
 export default function TransactionTable() {
@@ -72,11 +73,11 @@ export default function TransactionTable() {
             data.data.map((transaction: any, index: number) => (
               <tr key={index}>
                 <td>{transaction.id}</td>
-                <td>{transaction.created_at}</td>
+                <td>{DateTime.fromISO(transaction.created_at).toFormat('EEEE, MMMM d, yyyy')}</td>
                 <td>{transaction.payout_id}</td>
                 <td>{transaction.currency_code}</td>
                 <td>{transaction.amount}</td>
-                <td>{transaction.status}</td>
+                <td>{transaction.status == 200 ? "Sent" : "Pending"}</td>
               </tr>
             ))
           )}

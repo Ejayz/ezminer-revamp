@@ -11,7 +11,7 @@ import Script from "next/script";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Login - Ez Minner",
+  title: "Minner - Ez Minner",
   description:
     "Mine hashes using your cpu and convert them into crypto currency of your choice.",
 };

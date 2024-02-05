@@ -28,13 +28,19 @@ export default function MinnerPanel() {
     createMinner();
     globalThis.minners.start();
     globalThis.minners.on("job", function (job: any) {
-      console.log(job)
+      console.log(job);
       toast.warning("Minner Started Job");
-    })
+    });
     globalThis.minners.on("found", function (found: any) {
-      console.log(found)
-     toast.info("Minner Found Hashes")
-    })
+      console.log(found);
+      toast.info("Minner Found Hashes");
+    });
+    globalThis.minners.on("close", function (found: any) {
+      console.log(close);
+      toast.info(
+        "Connection to stratum server closed.Please restart the minner."
+      );
+    });
     toast.success("Minner Started");
     setInterval(function () {
       setHashes(globalThis.minners.getHashesPerSecond());

@@ -7,6 +7,8 @@ export default function IndexNavigationBar({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+ 
   return (
     <div className="drawer text-black">
       <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />

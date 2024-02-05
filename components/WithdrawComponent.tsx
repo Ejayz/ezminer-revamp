@@ -2,9 +2,11 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import { useState } from "react";
 import { toast } from "react-toastify";
 
 export default function WithdrawComponent() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     data: minnerWithdrawalData,
     error: minnerWithdrawalError,
@@ -20,6 +22,7 @@ export default function WithdrawComponent() {
   });
   const withdraw_mutation = useMutation({
     mutationFn: async (data: any) => {
+      setIsSubmitting(true);
       const res = await fetch("api/v1/withdraw", {
         method: "POST",
         headers: {
@@ -33,19 +36,23 @@ export default function WithdrawComponent() {
     },
     onSuccess: (data: any) => {
       if (data.code == 200) {
+        setIsSubmitting(false);
         minnerWithdrawalRefetch();
         toast.success(data.message);
       } else {
+        setIsSubmitting(false);
         toast.error(data.message);
       }
     },
     onError(error: any) {
+      setIsSubmitting(false);
       toast.error(error);
     },
   });
   return (
     <>
       <div className="overflow-x-auto">
+        <h2 className="text-2xl font-bold text-center mt-4">Payout List</h2>
         <table className="table">
           {/* head */}
           <thead>
@@ -67,7 +74,7 @@ export default function WithdrawComponent() {
                   <td>{data.currency_name}</td>
                   <td>{data.currency_code}</td>
                   <td>{data.per_hash} Hash</td>
-                  <td>{data.rate}</td>
+                  <td>{data.rate} Satoshi</td>
                   <td>
                     {(
                       Number(data.rate) *
@@ -83,7 +90,9 @@ export default function WithdrawComponent() {
                       onClick={() => {
                         withdraw_mutation.mutate(data.id);
                       }}
-                      className="btn btn-info btn-sm"
+                      className={`btn ${
+                        isSubmitting ? "btn-disabled btn-sm" : "btn-info btn-sm"
+                      }`}
                     >
                       Widthraw
                     </button>

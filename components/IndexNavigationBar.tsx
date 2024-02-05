@@ -35,7 +35,7 @@ export default function IndexNavigationBar({
             </label>
           </div>
           <div className="flex-1 px-2 mx-2">
-            <a className="btn btn-ghost text-xl">Ez Minner Dot Tech</a>
+            <a className="btn btn-ghost text-xl">Ez Miner Dot Tech</a>
           </div>
           <div className="flex-none hidden lg:block">
             <ul className="menu menu-horizontal">

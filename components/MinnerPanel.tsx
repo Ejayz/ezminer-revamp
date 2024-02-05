@@ -5,6 +5,7 @@ import * as jwt from "jsonwebtoken";
 import { useQuery } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 declare global {
   var minners: undefined | any;
 }
@@ -14,40 +15,55 @@ export default function MinnerPanel() {
   const [threads, setThreads] = useState(4);
   const [hashes, setHashes] = useState(0);
   const [totalHashes, setTotalHashes] = useState(0);
+  const router = useRouter();
   const createMinner = async () => {
     const windows: any = window || undefined;
     const token = windows.localStorage.getItem("user");
+    if (token == null) {
+      router.push("/login");
+      toast.error("Please login to start minning");
+      return false;
+    }
+
     const info = JSON.parse(token);
     globalThis.minners = new windows.Client.User(info.site_key, `${info.id}`, {
       throttle: throttle,
       threads: threads,
       c: "w",
     });
+    console.log(globalThis.minners);
+    return true;
   };
   const startMinner = async () => {
-    createMinner();
+    if (!(await createMinner())) {
+      return false;
+    }
     globalThis.minners.start();
+    globalThis.minners.on("open", function (open: any) {
+      console.log(open);
+      toast.success("Started Connection to stratum server");
+    });
     globalThis.minners.on("job", function (job: any) {
       console.log(job);
-      toast.warning("Minner Started Job");
+      toast.warning("Miner Started Job");
     });
     globalThis.minners.on("found", function (found: any) {
       console.log(found);
-      toast.info("Minner Found Hashes");
+      toast.info("Miner Found Hashes");
     });
     globalThis.minners.on("close", function (found: any) {
       console.log(close);
       toast.info(
-        "Connection to stratum server closed.Please restart the minner."
+        "Connection to stratum server closed.Please restart the Miner."
       );
     });
-    toast.success("Minner Started");
+    toast.success("Miner Started");
     setInterval(function () {
       setHashes(globalThis.minners.getHashesPerSecond());
     }, 1500);
     setInterval(function () {
       setTotalHashes(globalThis.minners.getTotalHashes());
-    }, 60500);
+    }, 30000);
   };
 
   return (
@@ -66,6 +82,7 @@ export default function MinnerPanel() {
             <div className="stat">
               <div className="stat-title">Hash/S</div>
               <div className="stat-value">{`${hashes.toFixed(2)} H/S`}</div>
+              <div className="stat-desc">Hashes updates every 1.5 seconds</div>
             </div>
 
             <div className="stat">
@@ -73,11 +90,12 @@ export default function MinnerPanel() {
               <div className="stat-value">{`${totalHashes.toFixed(
                 2
               )} Hashes`}</div>
+              <div className="stat-desc">Hashes updates every 30 seconds</div>
             </div>
           </div>
           <div className="stats bg-primary text-primary-content">
             <div className="stat">
-              <div className="stat-title">CPU Usage</div>
+              <div className="stat-title">CPU Throttle</div>
               <div className="stat-value">
                 <div className="join">
                   <button

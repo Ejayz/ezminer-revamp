@@ -10,7 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Dashboard - Ez Minner",
+  title: "Dashboard - Ez Miner",
   description:
     "Mine hashes using your cpu and convert them into crypto currency of your choice.",
 };

@@ -14,7 +14,7 @@ const getValidation=async ()=>{
   return data;
 }
 export const metadata: Metadata = {
-  title: "Withdraw - Ez Minner",
+  title: "Withdraw - Ez Miner",
   description:
     "Mine hashes using your cpu and convert them into crypto currency of your choice.",
 };

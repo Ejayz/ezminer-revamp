@@ -19,7 +19,7 @@ export default function Home() {
             <div className="card-body">
               <h2 className="card-title">CPU MINNING</h2>
               <p className="py-6">
-                Ez Minner will allow you to mine hashes using your cpu. You can
+                Ez Miner will allow you to mine hashes using your cpu. You can
                 then convert those hashes into crypto currency of your choice.
               </p>
             </div>

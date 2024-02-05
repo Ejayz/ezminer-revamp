@@ -15,19 +15,6 @@ import Link from "next/link";
 export default function MinnersStats() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const modal = useRef<HTMLDialogElement>(null);
-  const {
-    data: minnerWithdrawalData,
-    error: minnerWithdrawalError,
-    isLoading: minnerWithdrawalIsLoading,
-    isFetching: minnerWithdrawalIsFetching,
-    refetch: minnerWithdrawalRefetch,
-  } = useQuery({
-    queryKey: ["minnerWithdrawal"],
-    queryFn: async () => {
-      const res = await fetch("api/v1/getMinnersWithdrawalInformation");
-      return res.json();
-    },
-  });
   const { data, error, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["minnersStats"],
     queryFn: async () => {

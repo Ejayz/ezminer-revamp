@@ -1,3 +1,4 @@
+"use client";
 import Providers from "@/app/provider";
 import Link from "next/link";
 import { ToastContainer } from "react-toastify";
@@ -7,8 +8,6 @@ export default function IndexNavigationBar({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
- 
   return (
     <div className="drawer text-black">
       <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
@@ -37,7 +36,7 @@ export default function IndexNavigationBar({
             </label>
           </div>
           <div className="flex-1 px-2 mx-2">
-            <a className="btn btn-ghost text-xl">Ez Minner Dot Tech</a>
+            <a className="btn btn-ghost text-xl">Ez Miner Dot Tech</a>
           </div>
           <div className="flex-none hidden lg:block">
             <ul className="menu menu-horizontal">
@@ -46,10 +45,20 @@ export default function IndexNavigationBar({
                 <Link href={"/dashboard"}>Dashboard</Link>
               </li>
               <li>
-                <Link href={"/minner"}>Minner</Link>
+                <Link href={"/miner"}>Miner</Link>
               </li>
               <li>
-                <Link href={"/login"}>Logout</Link>
+                <button
+                  onClick={() => {
+                    fetch("/api/v1/logout").then((res) => {
+                      if (res.status == 200) {
+                        window.location.href = "/login";
+                      }
+                    });
+                  }}
+                >
+                  Logout
+                </button>
               </li>
             </ul>
           </div>
@@ -121,10 +130,20 @@ export default function IndexNavigationBar({
             <Link href={"/dashboard"}>Dashboard</Link>
           </li>
           <li>
-            <Link href={"/minner"}>Minner</Link>
+            <Link href={"/miner"}>Miner</Link>
           </li>
           <li>
-            <Link href={"/login"}>Logout</Link>
+            <button
+              onClick={() => {
+                fetch("/api/v1/logout").then((res) => {
+                  if (res.status == 200) {
+                    window.location.href = "/login";
+                  }
+                });
+              }}
+            >
+              Logout
+            </button>
           </li>
         </ul>
       </div>

@@ -12,14 +12,22 @@ import { DateTime } from "luxon";
 import { Form, Formik, FormikHelpers, FormikValues } from "formik";
 import LabeledInput from "./LabeledInput";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 export default function MinnersStats() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const modal = useRef<HTMLDialogElement>(null);
-  const { data, error, isLoading, isFetching, refetch } = useQuery({
+  const router = useRouter();
+  const { data, error, isLoading, isFetching, refetch, isError } = useQuery({
     queryKey: ["minnersStats"],
     queryFn: async () => {
       const res = await fetch("api/v1/getMinnersInformation");
-      return res.json();
+      let data = await res.json();
+      if (data.code == 401) {
+        toast.error("Login first to access this page");
+        router.push("/login");
+        return;
+      }
+      return data;
     },
   });
   const updateBalanceMutation = useMutation({
@@ -36,6 +44,11 @@ export default function MinnersStats() {
       });
 
       let data = await response.json();
+      if (data.code == 401) {
+        toast.error("Login first to access this page");
+        router.push("/login");
+        return;
+      }
       return data;
     },
     onSuccess: (data: any) => {
@@ -46,6 +59,10 @@ export default function MinnersStats() {
         setIsSubmitting(false);
         refetch();
         toast.success(data.message);
+      } else if (data.code == 401) {
+        toast.error("Login first to access this page");
+        router.push("/login");
+        return;
       } else {
         setIsSubmitting(false);
         toast.error(data.message);
@@ -71,13 +88,19 @@ export default function MinnersStats() {
       <div className="stat place-items-center">
         <div className="stat-title">Account Balance</div>
         <div className="stat-value">
-          {isLoading || isFetching ? "..." : data.data.balance_hash.hashes}
+          {isLoading || isFetching
+            ? "..."
+            : isError
+            ? "Not Available"
+            : data.data.balance_hash.hashes}
           Hashes
         </div>
         <div className="stat-desc">
           Balance Updated Since on{" "}
           {isLoading || isFetching
             ? "..."
+            : isError
+            ? "Not Available"
             : `${
                 Number(
                   DateTime.now()
@@ -109,6 +132,8 @@ export default function MinnersStats() {
             className={`btn mx-2  ${
               isLoading || isFetching
                 ? "btn-sm btn-disabled"
+                : isError
+                ? "Not Available"
                 : data.data.balance_hash.date == "Not Available"
                 ? "btn-sm "
                 : !getIsAllowedToFetchBalance(data.data.balance_hash.date)
@@ -120,19 +145,27 @@ export default function MinnersStats() {
           >
             {isSubmitting ? "Updating..." : "Update"}
           </button>
-          <Link href={"/withdraw"} className="btn mx-2 btn-sm">Withdraw</Link>
+          <Link href={"/withdraw"} className="btn mx-2 btn-sm">
+            Withdraw
+          </Link>
         </div>
       </div>
       <div className="stat place-items-center">
         <div className="stat-title">Overall Total Hashes</div>
         <div className="stat-value text-secondary">
-          {isLoading || isFetching ? "..." : data.data.total_hashes.hashes}{" "}
+          {isLoading || isFetching
+            ? "..."
+            : isError
+            ? "Not Available"
+            : data.data.total_hashes.hashes}{" "}
           Hashes
         </div>
         <div className="stat-desc text-secondary">
           Latest Updated Since{" "}
           {isLoading || isFetching
             ? "..."
+            : isError
+            ? "Not Available"
             : `${
                 Number(
                   DateTime.now()
@@ -162,6 +195,8 @@ export default function MinnersStats() {
         <div className="stat-value">
           {isLoading || isFetching
             ? "..."
+            : isError
+            ? "Not Available"
             : !data.data.latest_transaction
             ? "No Lates Withdrawal Found"
             : `${data.data.latest_transaction.hashes} Hashes`}
@@ -169,6 +204,8 @@ export default function MinnersStats() {
         <div className="stat-desc">
           {isLoading || isFetching
             ? "..."
+            : isError
+            ? "Not Available"
             : !data.data.latest_transaction
             ? ""
             : `${

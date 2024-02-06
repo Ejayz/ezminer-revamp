@@ -41,10 +41,10 @@ export default function IndexNavigationBar({
             <ul className="menu menu-horizontal">
               {/* Navbar menu content here */}
               <li>
-                <Link href={"#home"}>Home</Link>
+                <Link href={"/#home"}>Home</Link>
               </li>
               <li>
-                <Link href={"#payout"}>Payout</Link>
+                <Link href={"/#payout"}>Payout</Link>
               </li>
               <li>
                 <Link href={"/login"}>Login</Link>
@@ -119,10 +119,10 @@ export default function IndexNavigationBar({
         <ul className="menu p-4 w-80 min-h-full bg-base-200">
           {/* Sidebar content here */}
           <li>
-            <Link href={"#home"}>Home</Link>
+            <Link href={"/#home"}>Home</Link>
           </li>
           <li>
-            <Link href={"#payout"}>Payout</Link>
+            <Link href={"/#payout"}>Payout</Link>
           </li>
           <li>
             <Link href={"/login"}>Login</Link>

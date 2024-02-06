@@ -19,7 +19,9 @@ export default function MinnerTransactionTable() {
   });
   return (
     <div className="overflow-x-auto flex flex-col">
-      <h2 className="text-2xl font-bold text-center mt-4">Latest Payout Record</h2>
+      <h2 className="text-2xl font-bold text-center mt-4">
+        Latest Payout Record
+      </h2>
       <table className="table">
         {/* head */}
         <thead>
@@ -70,11 +72,17 @@ export default function MinnerTransactionTable() {
             <tr>
               <td colSpan={6}>Error: {error.message}</td>
             </tr>
+          ) : data.data == null ? (
+            <></>
           ) : (
             data.data.map((transaction: any, index: number) => (
               <tr key={index}>
                 <td>{transaction.id}</td>
-                <td>{DateTime.fromISO(transaction.created_at).toFormat('EEEE, MMMM d, yyyy')}</td>
+                <td>
+                  {DateTime.fromISO(transaction.created_at).toFormat(
+                    "EEEE, MMMM d, yyyy"
+                  )}
+                </td>
                 <td>{transaction.payout_id}</td>
                 <td>{transaction.currency_code}</td>
                 <td>{transaction.amount}</td>

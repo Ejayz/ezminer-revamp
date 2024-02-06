@@ -6,6 +6,7 @@ import Providers from "../provider";
 import { Suspense } from "react";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from "react-toastify";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -35,6 +36,7 @@ export default function RootLayout({
           pauseOnHover
           theme="light"
         />
+        <SpeedInsights></SpeedInsights>
         <Suspense fallback={<div>Loading...</div>}>
           <IndexNavigationBar>{children}</IndexNavigationBar>
         </Suspense>

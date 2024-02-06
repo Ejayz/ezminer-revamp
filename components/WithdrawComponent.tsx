@@ -2,11 +2,13 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
 export default function WithdrawComponent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
   const {
     data: minnerWithdrawalData,
     error: minnerWithdrawalError,
@@ -17,7 +19,13 @@ export default function WithdrawComponent() {
     queryKey: ["minnerWithdrawal"],
     queryFn: async () => {
       const res = await fetch("api/v1/getWithdrawal");
-      return res.json();
+      let data = await res.json();
+      if (data.code == 401) {
+        toast.error("Login first to access this page");
+        router.push("/login");
+        return;
+      }
+      return data;
     },
   });
   const withdraw_mutation = useMutation({
@@ -39,6 +47,10 @@ export default function WithdrawComponent() {
         setIsSubmitting(false);
         minnerWithdrawalRefetch();
         toast.success(data.message);
+      } else if (data.code == 401) {
+        toast.error("Login first to access this page");
+        router.push("/login");
+        return;
       } else {
         setIsSubmitting(false);
         toast.error(data.message);

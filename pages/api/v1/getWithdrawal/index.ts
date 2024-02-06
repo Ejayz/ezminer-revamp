@@ -41,6 +41,18 @@ export default async function handler(
     return res.status(200).json({ code: 200, message: "Success", data: data });
   } catch (error: any) {
     console.log(error);
+    if(error.message==="jwt expired"){
+      return res.status(401).json({ code: 401, message: "Unauthorized" });
+    }
+    else if(error.message==="jwt malformed"){
+      return res.status(401).json({ code: 401, message: "Unauthorized" });
+    }
+    else if (error.message === "invalid signature") {
+      return res.status(401).json({ code: 401, message: "Unauthorized" });
+    }
+    else if (error.message === "invalid token") {
+      return res.status(401).json({ code: 401, message: "Unauthorized" });
+    }
     return res
       .status(500)
       .json({ code: 500, message: "Internal server error" });

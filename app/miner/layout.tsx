@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Script from "next/script";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,6 +26,7 @@ export default function RootLayout({
     <html data-theme={"custom1"} lang="en">
       <body className={inter.className}>
         <Suspense fallback={<div>Loading...</div>}>
+        <SpeedInsights></SpeedInsights>
           <ToastContainer
             position="top-right"
             autoClose={5000}

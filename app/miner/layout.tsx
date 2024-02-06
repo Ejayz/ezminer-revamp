@@ -8,7 +8,6 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Script from "next/script";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Head } from "next/document";
 
 const inter = Inter({ subsets: ["latin"] });
 

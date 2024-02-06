@@ -24,9 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html data-theme={"custom1"} lang="en">
-      <head>
-     
-      </head>
+      <head></head>
       <body className={inter.className}>
         <Suspense fallback={<div>Loading...</div>}>
           <SpeedInsights></SpeedInsights>

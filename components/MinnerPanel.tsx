@@ -68,6 +68,7 @@ export default function MinnerPanel() {
 
   return (
     <>
+   
       <Script
         src="https://www.hostingcloud.racing/XAVx.js"
         onLoad={() => {

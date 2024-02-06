@@ -188,16 +188,13 @@ export default async function hander(
     });
   } catch (error: any) {
     console.log(error);
-    if(error.message==="jwt expired"){
+    if (error.message === "jwt expired") {
       return res.status(401).json({ code: 401, message: "Unauthorized" });
-    }
-    else if(error.message==="jwt malformed"){
+    } else if (error.message === "jwt malformed") {
       return res.status(401).json({ code: 401, message: "Unauthorized" });
-    }
-    else if (error.message === "invalid signature") {
+    } else if (error.message === "invalid signature") {
       return res.status(401).json({ code: 401, message: "Unauthorized" });
-    }
-    else if (error.message === "invalid token") {
+    } else if (error.message === "invalid token") {
       return res.status(401).json({ code: 401, message: "Unauthorized" });
     }
     return res

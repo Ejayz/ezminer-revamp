@@ -64,7 +64,7 @@ export default function MinnerTransactionTable() {
                 <td>
                   {transaction.status == 200
                     ? "Sent"
-                    : transaction.status
+                    : transaction.status == 202
                     ? "Pending"
                     : "Denied"}
                 </td>

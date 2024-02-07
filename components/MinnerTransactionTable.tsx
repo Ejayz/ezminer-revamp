@@ -38,34 +38,9 @@ export default function MinnerTransactionTable() {
           {isLoading ? (
             <>
               <tr>
-                <td colSpan={6} className="skeleton "></td>
-              </tr>
-              <tr>
-                <td colSpan={6} className="skeleton "></td>
-              </tr>
-              <tr>
-                <td colSpan={6} className="skeleton"></td>
-              </tr>
-              <tr>
-                <td colSpan={6} className="skeleton"></td>
-              </tr>
-              <tr>
-                <td colSpan={6} className="skeleton"></td>
-              </tr>
-              <tr>
-                <td colSpan={6} className="skeleton"></td>
-              </tr>
-              <tr>
-                <td colSpan={6} className="skeleton"></td>
-              </tr>
-              <tr>
-                <td colSpan={6} className="skeleton"></td>
-              </tr>
-              <tr>
-                <td colSpan={6} className="skeleton"></td>
-              </tr>
-              <tr>
-                <td colSpan={6} className="skeleton"></td>
+                <td colSpan={6} className="text-center">
+                  <div className="loader" /> Loading...
+                </td>
               </tr>
             </>
           ) : isError ? (
@@ -86,7 +61,13 @@ export default function MinnerTransactionTable() {
                 <td>{transaction.payout_id}</td>
                 <td>{transaction.currency_code}</td>
                 <td>{transaction.amount}</td>
-                <td>{transaction.status == 200 ? "Sent" : "Pending"}</td>
+                <td>
+                  {transaction.status == 200
+                    ? "Sent"
+                    : transaction.status
+                    ? "Pending"
+                    : "Denied"}
+                </td>
               </tr>
             ))
           )}

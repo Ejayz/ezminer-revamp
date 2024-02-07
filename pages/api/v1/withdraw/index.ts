@@ -135,6 +135,40 @@ export default async function hander(
           .status(400)
           .json({ code: 400, message: "Withdraw fails . Please try again" });
       }
+      let headerssList = {
+        Accept: "*/*",
+        "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+        "X-API-ID": COIN_IMP_PUBLIC,
+        "X-API-KEY": COIN_IMP_PRIVATE,
+        "Content-Type": "application/x-www-form-urlencoded",
+      };
+
+      let bodysContent = `site-key=${SITE_KEY}&user=${verify.id}&amount=${user.rows[0].balance_hash}`;
+
+      let responses = await fetch(
+        "https://www.coinimp.com/api/v2/user/withdraw",
+        {
+          method: "POST",
+          body: bodysContent,
+          headers: headerssList,
+        }
+      );
+
+      let datas = await responses.json();
+      if (datas.status == "failure") {
+        connection.query("ROLLBACK");
+        return res.status(400).json({
+          code: 400,
+          message:
+            "Current balance is missed match from blockchain record. Please contact support.",
+        });
+      }
+      connection.query("COMMIT");
+      return res.status(200).json({
+        code: 200,
+        message:
+          "Withdraw request was sent. It will be processed within 1-2 business day. Thank you and happy minning.",
+      });
     } else {
       const insertWithdraw = await connection.query(
         "INSERT INTO transaction_table (amount,currency,to_user,status,hash_number,minner_id) values ($1,$2,$3,$4,$5,$6) ",
@@ -153,39 +187,15 @@ export default async function hander(
           .status(400)
           .json({ code: 400, message: "Withdraw fails . Please try again" });
       }
+      else{
+        connection.query("COMMIT");
+        return res.status(200).json({
+          code: 200,
+          message:
+            "Withdraw request was sent. It will be processed within 1-2 business day. Thank you and happy minning.",
+        });
+      }
     }
-
-    let headersList = {
-      Accept: "*/*",
-      "User-Agent": "Thunder Client (https://www.thunderclient.com)",
-      "X-API-ID": COIN_IMP_PUBLIC,
-      "X-API-KEY": COIN_IMP_PRIVATE,
-      "Content-Type": "application/x-www-form-urlencoded",
-    };
-
-    let bodyContent = `site-key=${SITE_KEY}&user=${verify.id}&amount=${user.rows[0].balance_hash}`;
-
-    let response = await fetch("https://www.coinimp.com/api/v2/user/withdraw", {
-      method: "POST",
-      body: bodyContent,
-      headers: headersList,
-    });
-
-    let data = await response.json();
-    if (data.status == "failure") {
-      connection.query("ROLLBACK");
-      return res.status(400).json({
-        code: 400,
-        message:
-          "Current balance is missed match from blockchain record. Please contact support.",
-      });
-    }
-    connection.query("COMMIT");
-    return res.status(200).json({
-      code: 200,
-      message:
-        "Withdraw request was sent. It will be processed within 1-2 business day. Thank you and happy minning.",
-    });
   } catch (error: any) {
     console.log(error);
     if (error.message === "jwt expired") {

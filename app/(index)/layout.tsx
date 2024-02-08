@@ -22,12 +22,7 @@ export default function RootLayout({
   return (
     <html data-theme={"custom1"} lang="en">
       <body>
-        <script
-          src="https://alwingulla.com/88/tag.min.js"
-          data-zone="42334"
-          async
-          data-cfasync="false"
-        ></script>
+      
       </body>
       <body className={inter.className}>
         <SpeedInsights></SpeedInsights>

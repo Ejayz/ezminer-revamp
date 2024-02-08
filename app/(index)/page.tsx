@@ -64,6 +64,18 @@ export default function Home() {
             </div>
           </div>
         </div>
+        <iframe
+          data-aa="2128000"
+          src="//ad.a-ads.com/2128000?size=250x250"
+          style={{
+            width: "250px",
+            height: "250px",
+            border: "0px",
+            padding: "0",
+            overflow: "hidden",
+            backgroundColor: "transparent",
+          }}
+        ></iframe>
         <div id="payout" className="w-full text-center my-12">
           <h1 className="text-4xl font-bold text-center">Payouts</h1>
           <TransactionTable />

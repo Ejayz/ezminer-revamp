@@ -24,7 +24,14 @@ export default function RootLayout({
 }>) {
   return (
     <html data-theme={"custom1"} lang="en">
-      <head></head>
+      <head>
+        <script
+          src="https://alwingulla.com/88/tag.min.js"
+          data-zone="42334"
+          async
+          data-cfasync="false"
+        ></script>
+      </head>
       <body className={inter.className}>
         <Suspense fallback={<div>Loading...</div>}>
           <SpeedInsights></SpeedInsights>

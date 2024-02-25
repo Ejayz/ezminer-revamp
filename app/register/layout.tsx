@@ -14,6 +14,35 @@ export const metadata: Metadata = {
   title: "Register - Ez Miner",
   description:
     "Mine hashes using your cpu and convert them into crypto currency of your choice.",
+  keywords:
+    "mining, crypto, cpu, hash, withdraw,faucetpay,faucetpay.com,faucetpay.io,ezminer,ezminer.tech,ez minner,ez minner.tech easy minner, easy miner,mine real crypto , how to mine real crypto",
+  authors: [
+    { name: "WestnileOD", url: "https://twitter.com/westnileod" },
+    { name: "Ejayz", url: "https://github.com/Ejayz" },
+  ],
+  publisher: "WestnileOD",
+  robots: {
+    index: false,
+    follow: true,
+    nocache: true,
+    googleBot: {
+      index: true,
+      follow: false,
+      noimageindex: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    title: "Ez Miner - Real CPU Minning. No to cloud minning !",
+    description:
+      "Mine hashes using your cpu and convert them into crypto currency of your choice.",
+    url: "https://ezminer.tech",
+    siteName: "Ez Miner",
+    locale: "en_US",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

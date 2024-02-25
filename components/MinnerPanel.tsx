@@ -76,7 +76,7 @@ export default function MinnerPanel() {
           if (typeof windows === "undefined") return;
         }}
       ></Script>
-      <div className="card w-3/4 bg-neutral text-neutral-content">
+      <div className="card w-1/2 bg-neutral text-neutral-content">
         <div className="card-body items-center text-center">
           <h2 className="card-title">Minner Panel</h2>
           <div className="stats bg-primary text-primary-content">

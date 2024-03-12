@@ -113,6 +113,12 @@ export default async function hander(
           message:
             "Auto payment failed. Please try again or contact support. Dont worry we will keep your balance safe.",
         });
+      } else if (data.status == 456) {
+        return res.status(404).json({
+          code: 404,
+          message:
+            "This email is not registered with faucetpay.io, Either contact support or register this email with faucetpay.io.",
+        });
       }
       const insertWithdraw = await connection.query(
         "INSERT INTO transaction_table (amount,currency,current_balance,status,payout_user_hash,payout_id,referral,hash_number,minner_id,to_user) values ( $1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ",
@@ -135,34 +141,7 @@ export default async function hander(
           .status(400)
           .json({ code: 400, message: "Withdraw fails . Please try again" });
       }
-      let headerssList = {
-        Accept: "*/*",
-        "User-Agent": "Thunder Client (https://www.thunderclient.com)",
-        "X-API-ID": COIN_IMP_PUBLIC,
-        "X-API-KEY": COIN_IMP_PRIVATE,
-        "Content-Type": "application/x-www-form-urlencoded",
-      };
 
-      let bodysContent = `site-key=${SITE_KEY}&user=${verify.id}&amount=${user.rows[0].balance_hash}`;
-
-      let responses = await fetch(
-        "https://www.coinimp.com/api/v2/user/withdraw",
-        {
-          method: "POST",
-          body: bodysContent,
-          headers: headerssList,
-        }
-      );
-
-      let datas = await responses.json();
-      if (datas.status == "failure") {
-        connection.query("ROLLBACK");
-        return res.status(400).json({
-          code: 400,
-          message:
-            "Current balance is missed match from blockchain record. Please contact support.",
-        });
-      }
       connection.query("COMMIT");
       return res.status(200).json({
         code: 200,
@@ -186,8 +165,7 @@ export default async function hander(
         return res
           .status(400)
           .json({ code: 400, message: "Withdraw fails . Please try again" });
-      }
-      else{
+      } else {
         connection.query("COMMIT");
         return res.status(200).json({
           code: 200,

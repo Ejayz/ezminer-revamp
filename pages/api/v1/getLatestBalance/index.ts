@@ -56,6 +56,13 @@ export default async function handler(
       return res.status(500).json({ code: 500, message: data.message });
     }
 
+if(data.message.pending==0){
+  connection.query("ROLLBACK");
+  return res.status(200).json({ code: 200, message: "Currently no balance on minner. Please mine more or wait for a while before updating your balance again ." });
+}
+
+
+
     const UpdateBalanceQuery =
       "UPDATE minners_account SET total_hashes=$1 , balance_hash=$2,updated_at=now() where id=$3";
     const calculateTotalBalance =

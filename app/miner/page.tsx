@@ -15,6 +15,7 @@ export default async function Home() {
       });
       return res.json();
     },
+    refetchOnWindowFocus: false,
   });
 
   console.log(data);

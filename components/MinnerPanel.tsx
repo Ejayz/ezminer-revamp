@@ -52,7 +52,7 @@ export default function MinnerPanel() {
       toast.info("Miner Found Hashes");
     });
     globalThis.minners.on("close", function (found: any) {
-      console.log(close);
+      console.log(found);
       toast.info(
         "Connection to stratum server closed.Please restart the Miner."
       );

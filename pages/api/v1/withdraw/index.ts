@@ -11,6 +11,10 @@ const COIN_IMP_PUBLIC = process.env.COIN_IMP_PUBLIC || "";
 const COIN_IMP_PRIVATE = process.env.COIN_IMP_PRIVATE || "";
 const SITE_KEY = process.env.SITE_KEY || "";
 const API_KEY = process.env.API_KEY || "";
+const PAYMENT_MANAGER_API_KEY = process.env.PAYMENT_MANAGER_API_KEY || "";
+const PAYMENT_MANAGER_SITE_KEY = process.env.PAYMENT_MANAGER_SITE_KEY || "";
+const PAYMENT_MANAGER_URL = process.env.PAYMENT_MANAGER_URL || "";
+
 export default async function hander(
   req: NextApiRequest,
   res: NextApiResponse
@@ -76,97 +80,98 @@ export default async function hander(
         .json({ code: 400, message: "Balance not updated" });
     }
 
-    const getAutoTransaction = await connection.query(
-      "select * from payment_manager_options where is_exist=true"
+    const insertWithdraw = await connection.query(
+      "INSERT INTO transaction_table (amount,currency,to_user,status,hash_number,minner_id) values ($1,$2,$3,$4,$5,$6) RETURNING id",
+      [
+        getCalculatedBalance,
+        currency_id,
+        user.rows[0].email,
+        202,
+        user.rows[0].balance_hash,
+        verify.id,
+      ]
     );
-    if (getAutoTransaction.rows.length == 0) {
+
+    const insertID = insertWithdraw.rows[0].id;
+
+    if (insertWithdraw.rowCount == 0) {
       connection.query("ROLLBACK");
       return res
         .status(400)
-        .json({ code: 400, message: "Payment manager not found" });
-    }
-    if (getAutoTransaction.rows[0].auto_transaction == true) {
+        .json({ code: 400, message: "Withdraw fails . Please try again" });
+    } else {
+      connection.query("COMMIT");
+
       let headersList = {
         Accept: "*/*",
         "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+        "Content-Type": "application/json",
+        referer: `${req.headers.origin}`,
       };
 
-      let bodyContent = new FormData();
-      bodyContent.append("api_key", API_KEY);
-      bodyContent.append("amount", getCalculatedBalance.toString());
-      bodyContent.append("to", user.rows[0].email);
-      bodyContent.append("currency", currency.rows[0].currency_code);
-      bodyContent.append("referral", "false");
-      console.log(bodyContent);
-      let response = await fetch("https://faucetpay.io/api/v1/send", {
-        method: "POST",
-        body: bodyContent,
-        headers: headersList,
+      let bodyContent = JSON.stringify({
+        amount: getCalculatedBalance.toString(),
+        currency_code: currency.rows[0].currency_code,
+        refferal: false,
+        wallet_address: user.rows[0].email,
+        callback_url: `${req.headers.origin}/api/v1/callback_url?transaction_id=${insertID}`,
       });
+
+      let response = await fetch(
+        `${PAYMENT_MANAGER_URL}/api/v1/external/sendtransaction?api_key=${PAYMENT_MANAGER_API_KEY}&site_id=${PAYMENT_MANAGER_SITE_KEY}`,
+        {
+          method: "POST",
+          body: bodyContent,
+          headers: headersList,
+        }
+      );
 
       let data = await response.json();
       console.log(data);
-      if (data.status != 200) {
-        connection.query("ROLLBACK");
+      if (response.status != 200) {
+        const getTransaction = await connection.query(
+          "select * from transaction_table where id=$1",
+          [insertID]
+        );
+        if (getTransaction.rows.length == 0) {
+          await connection.query("ROLLBACK");
+          return res
+            .status(400)
+            .json({ code: 400, message: "Transaction not found" });
+        }
+        const getMinnerAccount = await connection.query(
+          "select * from minners_account where id=$1",
+          [getTransaction.rows[0].minner_id]
+        );
+        if (getMinnerAccount.rows.length == 0) {
+          await connection.query("ROLLBACK");
+          return res
+            .status(400)
+            .json({ code: 400, message: "Minner not found" });
+        }
+        const getBalance = getMinnerAccount.rows[0].balance_hash;
+        const getTransactionBalance = getTransaction.rows[0].hash_number;
+        const newBalance = getBalance + getTransactionBalance;
+        const updateBalance = await connection.query(
+          "update minners_account set balance_hash=$1 where id=$2",
+          [newBalance, getTransaction.rows[0].minner_id]
+        );
+        if (updateBalance.rowCount == 0) {
+          await connection.query("ROLLBACK");
+          return res
+            .status(400)
+            .json({ code: 400, message: "Balance not updated" });
+        }
+        const removeWithdraw = await connection.query(
+          "DELETE FROM transaction_table where id=$1",
+          [insertID]
+        );
+
         return res.status(400).json({
           code: 400,
-          message:
-            "Auto payment failed. Please try again or contact support. Dont worry we will keep your balance safe.",
+          message: data.error,
         });
-      } else if (data.status == 456) {
-        return res.status(404).json({
-          code: 404,
-          message:
-            "This email is not registered with faucetpay.io, Either contact support or register this email with faucetpay.io.",
-        });
-      }
-      const insertWithdraw = await connection.query(
-        "INSERT INTO transaction_table (amount,currency,current_balance,status,payout_user_hash,payout_id,referral,hash_number,minner_id,to_user) values ( $1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ",
-        [
-          getCalculatedBalance,
-          currency_id,
-          parseFloat(data.balance),
-          data.status.toString(),
-          data.payout_user_hash,
-          data.payout_id.toString(),
-          false,
-          user.rows[0].balance_hash,
-          verify.id,
-          user.rows[0].email,
-        ]
-      );
-      if (insertWithdraw.rowCount == 0) {
-        connection.query("ROLLBACK");
-        return res
-          .status(400)
-          .json({ code: 400, message: "Withdraw fails . Please try again" });
-      }
-
-      connection.query("COMMIT");
-      return res.status(200).json({
-        code: 200,
-        message:
-          "Withdraw request was sent. It will be processed within 1-2 business day. Thank you and happy minning.",
-      });
-    } else {
-      const insertWithdraw = await connection.query(
-        "INSERT INTO transaction_table (amount,currency,to_user,status,hash_number,minner_id) values ($1,$2,$3,$4,$5,$6) ",
-        [
-          getCalculatedBalance,
-          currency_id,
-          user.rows[0].email,
-          202,
-          user.rows[0].balance_hash,
-          verify.id,
-        ]
-      );
-      if (insertWithdraw.rowCount == 0) {
-        connection.query("ROLLBACK");
-        return res
-          .status(400)
-          .json({ code: 400, message: "Withdraw fails . Please try again" });
       } else {
-        connection.query("COMMIT");
         return res.status(200).json({
           code: 200,
           message:
@@ -175,7 +180,6 @@ export default async function hander(
       }
     }
   } catch (error: any) {
-    console.log(error);
     if (error.message === "jwt expired") {
       return res.status(401).json({ code: 401, message: "Unauthorized" });
     } else if (error.message === "jwt malformed") {

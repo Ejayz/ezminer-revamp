@@ -3,10 +3,13 @@
 import RegisterComponent from "@/components/RegisterComponent";
 import WithdrawComponent from "@/components/WithdrawComponent";
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import Marquee from "react-fast-marquee";
 
 export default function Home() {
-  const { data, error, isFetching, isLoading, refetch } = useQuery({
+  const navs = useRouter();
+  const { data, error, isFetching, isLoading, refetch, isError } = useQuery({
     queryKey: ["getMaintenanceMode"],
     queryFn: async () => {
       const res = await fetch("/api/v1/getMaintenance", {
@@ -15,15 +18,32 @@ export default function Home() {
           "Content-Type": "application/json",
         },
       });
-      return res.json();
+      const data = await res.json();
+
+      if (data.code == 401) {
+        navs.push("/login?session=expired");
+        throw new Error("Login first to access this page");
+      } else if (data.code === 200) {
+        return data;
+      } else {
+        console.log(data);
+        throw new Error("Error in retrieving announcements.");
+      }
     },
+    retry: 1,
   });
+  
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
 
   return (
     <>
       <Marquee className="bg-base-100 flex text-xl">
         {isLoading || isFetching ? (
           <span>Getting announcements...</span>
+        ) : isError ? (
+          <span>Error in retrieving announcement .</span>
         ) : (
           <>
             <span>Announcements:</span>

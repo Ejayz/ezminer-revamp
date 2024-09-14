@@ -3,9 +3,10 @@
 import Script from "next/script";
 import * as jwt from "jsonwebtoken";
 import { useQuery } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { array } from "yup";
 declare global {
   var minners: undefined | any;
 }
@@ -16,9 +17,14 @@ export default function MinnerPanel() {
   const [hashes, setHashes] = useState(0);
   const [totalHashes, setTotalHashes] = useState(0);
   const router = useRouter();
+  const [stats, setStats] = useState<string[]>([
+    "Welcome to Minner Panel",
+    "Please start minning to get started",
+  ]);
   const createMinner = async () => {
     const windows: any = window || undefined;
     const token = windows.localStorage.getItem("user");
+
     if (token == null) {
       router.push("/login");
       toast.error("Please login to start minning");
@@ -31,7 +37,6 @@ export default function MinnerPanel() {
       threads: threads,
       c: "w",
     });
-    console.log(globalThis.minners);
     return true;
   };
   const startMinner = async () => {
@@ -40,24 +45,22 @@ export default function MinnerPanel() {
     }
     globalThis.minners.start();
     globalThis.minners.on("open", function (open: any) {
-      console.log(open);
-      toast.success("Started Connection to stratum server");
+      setStats((arrayData) => ["Miner Started", ...arrayData]);
     });
     globalThis.minners.on("job", function (job: any) {
-      console.log(job);
-      toast.warning("Miner Started Job");
+      setStats((arrayData) => ["New Job Recieved", ...arrayData]);
     });
     globalThis.minners.on("found", function (found: any) {
-      console.log(found);
-      toast.info("Miner Found Hashes");
+      setStats((arrayData) => ["Block Found", ...arrayData]);
     });
     globalThis.minners.on("close", function (found: any) {
-      console.log(found);
-      toast.info(
-        "Connection to stratum server closed.Please restart the Miner."
-      );
+      setStats((arrayData) => ["Miner Stopped", ...arrayData]);
     });
     toast.success("Miner Started");
+    setInterval(function () {
+      setStats([]);
+      setStats((arrayData) => ["Logs cleared", ...arrayData]);
+    }, 60000);
     setInterval(function () {
       setHashes(globalThis.minners.getHashesPerSecond());
     }, 1500);
@@ -66,9 +69,9 @@ export default function MinnerPanel() {
     }, 30000);
   };
 
+  console.log(stats.length);
   return (
     <>
-   
       <Script
         src="https://www.hostingcloud.racing/XAVx.js"
         onLoad={() => {
@@ -106,7 +109,6 @@ export default function MinnerPanel() {
                       if (throttle > 0.01) {
                         setThrottle(newThrottle);
                         globalThis.minners.setThrottle(newThrottle);
-                        console.log(globalThis.minners.getThrottle());
                       }
                     }}
                     className={`join-item btn ${
@@ -124,7 +126,6 @@ export default function MinnerPanel() {
                       if (throttle < 1) {
                         setThrottle(newThrottle);
                         globalThis.minners.setThrottle(newThrottle);
-                        console.log(globalThis.minners.getThrottle());
                       }
                     }}
                     className={`join-item btn ${
@@ -197,6 +198,19 @@ export default function MinnerPanel() {
             >
               Stop
             </button>
+          </div>
+          <div className="mockup-code bg-white text-xs text-left w-11/12 text-black overflow-y-auto">
+            {stats.map((stat, index) => {
+              return (
+                <pre
+                  key={index}
+                  data-prefix={`~`}
+                  className={`${index == 0 ? "border" : ""}`}
+                >
+                  <code>{stat}</code>
+                </pre>
+              );
+            })}
           </div>
         </div>
       </div>

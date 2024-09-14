@@ -15,6 +15,7 @@ export default function WithdrawComponent() {
     isLoading: minnerWithdrawalIsLoading,
     isFetching: minnerWithdrawalIsFetching,
     refetch: minnerWithdrawalRefetch,
+    isError: minnerWithdrawalIsError,
   } = useQuery({
     queryKey: ["minnerWithdrawal"],
     queryFn: async () => {
@@ -23,9 +24,12 @@ export default function WithdrawComponent() {
       if (data.code == 401) {
         toast.error("Login first to access this page");
         router.push("/login");
-        return;
+        throw new Error("Login first to access this page");
+      } else if (data.code == 200) {
+        return data;
+      } else {
+        throw new Error("Error in retrieving announcements.");
       }
-      return data;
     },
   });
   const withdraw_mutation = useMutation({
@@ -79,37 +83,53 @@ export default function WithdrawComponent() {
             </tr>
           </thead>
           <tbody>
-            {minnerWithdrawalData?.data.currency.map(
-              (data: any, index: number) => (
-                <tr key={index}>
-                  <th>{index + 1}</th>
-                  <td>{data.currency_name}</td>
-                  <td>{data.currency_code}</td>
-                  <td>{data.per_hash} Hash</td>
-                  <td>{data.rate} Satoshi</td>
-                  <td>
-                    {(
-                      Number(data.rate) *
-                      Number(
-                        minnerWithdrawalData.data.users.balance /
-                          Number(data.per_hash)
-                      )
-                    ).toFixed(8)}{" "}
-                    Satoshi
-                  </td>
-                  <td>
-                    <button
-                      onClick={() => {
-                        withdraw_mutation.mutate(data.id);
-                      }}
-                      className={`btn ${
-                        isSubmitting ? "btn-disabled btn-sm" : "btn-info btn-sm"
-                      }`}
-                    >
-                      Widthraw
-                    </button>
-                  </td>
-                </tr>
+            {minnerWithdrawalIsLoading || minnerWithdrawalIsFetching ? (
+              <tr>
+                <td colSpan={7} className="text-center">
+                  Loading...
+                </td>
+              </tr>
+            ) : minnerWithdrawalIsError || minnerWithdrawalData.length == 0 ? (
+              <tr>
+                <td colSpan={7} className="text-center">
+                  Error in retrieving data.
+                </td>
+              </tr>
+            ) : (
+              minnerWithdrawalData?.data.currency.map(
+                (data: any, index: number) => (
+                  <tr key={index}>
+                    <th>{index + 1}</th>
+                    <td>{data.currency_name}</td>
+                    <td>{data.currency_code}</td>
+                    <td>{data.per_hash} Hash</td>
+                    <td>{data.rate} Satoshi</td>
+                    <td>
+                      {(
+                        Number(data.rate) *
+                        Number(
+                          minnerWithdrawalData.data.users.balance /
+                            Number(data.per_hash)
+                        )
+                      ).toFixed(8)}{" "}
+                      Satoshi
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => {
+                          withdraw_mutation.mutate(data.id);
+                        }}
+                        className={`btn ${
+                          isSubmitting
+                            ? "btn-disabled btn-sm"
+                            : "btn-info btn-sm"
+                        }`}
+                      >
+                        Widthraw
+                      </button>
+                    </td>
+                  </tr>
+                )
               )
             )}
           </tbody>

@@ -2,9 +2,12 @@
 import MinnerPanel from "@/components/MinnerPanel";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import Marquee from "react-fast-marquee";
-export default async function Home() {
-  const { data, error, isFetching, isLoading, refetch } = useQuery({
+export default  function Home() {
+  const navs = useRouter();
+
+  const { data, error, isFetching, isLoading, refetch, isError } = useQuery({
     queryKey: ["getMaintenanceMode"],
     queryFn: async () => {
       const res = await fetch("/api/v1/getMaintenance", {
@@ -13,7 +16,15 @@ export default async function Home() {
           "Content-Type": "application/json",
         },
       });
-      return res.json();
+      const data = await res.json();
+      if (data.code == 401) {
+        navs.push("/login?session=expired");
+        throw new Error("Login first to access this page");
+      } else if (data.code == 200) {
+        return data;
+      } else {
+        throw new Error("Error in retrieving announcements.");
+      }
     },
     refetchOnWindowFocus: false,
   });
@@ -25,6 +36,8 @@ export default async function Home() {
       <Marquee className="bg-base-100 flex text-xl">
         {isLoading || isFetching ? (
           <span>Getting announcements...</span>
+        ) : isError || data.length == 0 ? (
+          <span>Error in retrieving announcements.</span>
         ) : (
           <>
             <span>Announcements:</span>
@@ -62,6 +75,10 @@ export default async function Home() {
             ></iframe>
           </div>
           {isLoading || isFetching ? (
+            <div className="flex justify-center w-1/2 items-center">
+              <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-24 w-24"></div>
+            </div>
+          ) : isError || data.length == 0 ? (
             <div className="flex justify-center w-1/2 items-center">
               <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-24 w-24"></div>
             </div>

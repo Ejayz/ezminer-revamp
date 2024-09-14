@@ -9,17 +9,20 @@ import NormalInput from "./NormalInput";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginComponent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const nav = useRouter();
+  const paths = useSearchParams();
   const validationSchema = yup.object().shape({
     email: yup.string().email().required("Email is required"),
     password: yup.string().required("Password is required"),
     remember_me: yup.boolean(),
   });
+
+ 
 
   const loginMutation = useMutation({
     mutationFn: async (values: any) => {
@@ -47,7 +50,7 @@ export default function LoginComponent() {
     },
     onSuccess: (data) => {
       if (data.code == 200) {
-        console.log(data.code)
+        console.log(data.code);
         window.localStorage.setItem("user", JSON.stringify(data.data.user));
         setIsSubmitting(false);
         nav.push("/dashboard");

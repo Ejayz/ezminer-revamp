@@ -25,11 +25,15 @@ export default function MinnersStats() {
       if (data.code == 401) {
         toast.error("Login first to access this page");
         router.push("/login");
-        return;
+        throw new Error("Login first to access this page");
+      }else if (data.code == 200) {
+        return data;
+      } else {
+        throw new Error("Error in retrieving announcements.");
       }
-      return data;
     },
   });
+  
   const updateBalanceMutation = useMutation({
     mutationFn: async () => {
       setIsSubmitting(true);

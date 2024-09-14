@@ -26,12 +26,14 @@ export default async function handler(
     const getMaintenance = await connection.query(
       "select * from payment_manager_options where id=1 and is_exist=true"
     );
-    return res
-      .status(200)
-      .json({ status: 200, data: {
+
+    return res.status(200).json({
+      code: 200,
+      data: {
         is_maintenance: getMaintenance.rows[0].maintenance_mode,
         is_auto_transaction: getMaintenance.rows[0].auto_transaction,
-      } });
+      },
+    });
   } catch (error) {
     return res.status(401).json({ code: 401, message: "Unauthorized" });
   } finally {

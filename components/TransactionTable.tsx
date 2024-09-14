@@ -2,9 +2,12 @@
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { DateTime } from "luxon";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 export default function TransactionTable() {
+  const router = useRouter();
   const [transactionPage, setTransactionPage] = useState(0);
   const { data, error, isLoading, isError, isFetching } = useQuery({
     queryKey: ["transactions", transactionPage],
@@ -12,7 +15,16 @@ export default function TransactionTable() {
       const response = await fetch(
         `/api/v1/getTransactions/?page=${transactionPage}`
       );
-      return response.json();
+      const data = await response.json();
+      if (data.code == 401) {
+        toast.error("Login first to access this page");
+        router.push("/login");
+        throw new Error("Login first to access this page");
+      } else if (data.code == 200) {
+        return data;
+      } else {
+        throw new Error("Error in retrieving announcements.");
+      }
     },
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
